@@ -13,6 +13,8 @@ This project is designed to test the Kubernetes and OpenShift API server using G
   - `create-go-module.sh`: Creates the Go module for the project.
   - `install-go-libraries.sh`: Installs the required Go libraries, including Kubernetes and OpenShift client libraries, Ginkgo, and Gomega.
   - `install-golang.sh`: Script to download and install Go.
+- `utils/`: folder which includes basic utility functions to help simplify test writing. 
+  - `auth.go`: Used to authenticate to any Openshift/k8s client API.
 
 ## Getting Started
 
@@ -70,10 +72,3 @@ ginkgo -v tests/
 - Ensure you have the correct access to your Kubernetes/OpenShift cluster.
 - The Ginkgo CLI tool is required to run the tests.
 
-## Files Not Required for GitHub Upload
-
-- `install-golang.sh`: This script is used for setting up the Go environment and is not required once Go is installed.
-- `create-go-module.sh`: This script is for creating the Go module and is only needed initially.
-- `install-go-libraries.sh`: This script installs the Go libraries and is not needed after the dependencies are installed.
-
-You can safely exclude these scripts from the GitHub repository if you do not wish to include environment setup scripts.
