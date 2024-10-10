@@ -1,14 +1,12 @@
 package tests
 
 import (
-	"context"
 	"fmt"
 
 	"api-tests/utils"
 
 	mcfgv1 "github.com/openshift/api/machineconfiguration/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
@@ -17,19 +15,16 @@ import (
 var _ = Describe("MachineConfigPool Health Check", func() {
 
 	It("should ensure all MachineConfigPools are updated and healthy", func() {
-		configClient, err := utils.GetResourceClient("machineconfiguration.openshift.io", "v1", "machineconfigpools")
+		client, err := utils.InitializeMCPClient()
 		if err != nil {
 			fmt.Printf("Error creating MCP client: %v\n", err)
 			return
 		}
 
-		mcpList, err := configClient.List(context.TODO(), metav1.ListOptions{})
+		mcpList, err := utils.GetMCP(client)
 		Expect(err).NotTo(HaveOccurred(), "Failed to list MachineConfigPools")
 
-		for _, mcpUnstructured := range mcpList.Items {
-			var mcp mcfgv1.MachineConfigPool
-			err := runtime.DefaultUnstructuredConverter.FromUnstructured(mcpUnstructured.Object, &mcp)
-			Expect(err).NotTo(HaveOccurred(), fmt.Sprintf("Failed to convert Unstructured to api resource for %s", mcpUnstructured.GetName()))
+		for _, mcp := range mcpList {
 
 			By(fmt.Sprintf("Validating MachineConfigPool: %s", mcp.Name))
 			//By(fmt.Sprintf("MCP '%s' Conditions: %+v", mcp.Name, mcp.Status.Conditions))
@@ -50,13 +45,13 @@ var _ = Describe("MachineConfigPool Health Check", func() {
 					mcp.Name, mcp.Status.DegradedMachineCount))
 
 			// Check that the MCP is Updated and not Degraded
-			updatedCondition := getMCPCondition(mcp.Status.Conditions, mcfgv1.MachineConfigPoolUpdated)
+			updatedCondition := utils.GetMCPCondition(mcp.Status.Conditions, mcfgv1.MachineConfigPoolUpdated)
 			Expect(updatedCondition).NotTo(BeNil(),
 				fmt.Sprintf("MCP '%s' does not have an 'Updated' condition", mcp.Name))
 			Expect(string(updatedCondition.Status)).To(Equal(string(metav1.ConditionTrue)),
 				fmt.Sprintf("MCP '%s' is not in 'Updated' state", mcp.Name))
 
-			degradedCondition := getMCPCondition(mcp.Status.Conditions, mcfgv1.MachineConfigPoolDegraded)
+			degradedCondition := utils.GetMCPCondition(mcp.Status.Conditions, mcfgv1.MachineConfigPoolDegraded)
 			Expect(degradedCondition).NotTo(BeNil(),
 				fmt.Sprintf("MCP '%s' does not have a 'Degraded' condition", mcp.Name))
 			Expect(string(degradedCondition.Status)).To(Equal(string(metav1.ConditionFalse)),
@@ -64,13 +59,3 @@ var _ = Describe("MachineConfigPool Health Check", func() {
 		}
 	})
 })
-
-// Helper function to get a specific condition from MCP status
-func getMCPCondition(conditions []mcfgv1.MachineConfigPoolCondition, conditionType mcfgv1.MachineConfigPoolConditionType) *mcfgv1.MachineConfigPoolCondition {
-	for _, condition := range conditions {
-		if condition.Type == conditionType {
-			return &condition
-		}
-	}
-	return nil
-}
