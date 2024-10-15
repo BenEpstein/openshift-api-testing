@@ -9,18 +9,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// InitializeMCPClient returns a MachineConfigPoolsGetter client for MachineConfigPool operations
-func InitializeMCPClient() (machineconfigv1.MachineConfigPoolsGetter, error) {
-	config, err := Authenticate()
-	if err != nil {
-		return nil, fmt.Errorf("failed to authenticate: %w", err)
-	}
-
-	return machineconfigv1.NewForConfig(config)
-}
-
 // GetMCP retrieves MachineConfigPool objects
-func GetMCP(mcpClient machineconfigv1.MachineConfigPoolsGetter, mcpNames ...string) ([]mcfgv1.MachineConfigPool, error) {
+func GetMCP(mcpClient machineconfigv1.MachineconfigurationV1Client, mcpNames ...string) ([]mcfgv1.MachineConfigPool, error) {
 	var mcpList []mcfgv1.MachineConfigPool
 
 	if len(mcpNames) == 0 {

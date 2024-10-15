@@ -15,13 +15,8 @@ import (
 var _ = Describe("MachineConfigPool Health Check", func() {
 
 	It("should ensure all MachineConfigPools are updated and healthy", func() {
-		client, err := utils.InitializeMCPClient()
-		if err != nil {
-			fmt.Printf("Error creating MCP client: %v\n", err)
-			return
-		}
 
-		mcpList, err := utils.GetMCP(client)
+		mcpList, err := utils.GetMCP(*ctx.MCPClient)
 		Expect(err).NotTo(HaveOccurred(), "Failed to list MachineConfigPools")
 
 		for _, mcp := range mcpList {

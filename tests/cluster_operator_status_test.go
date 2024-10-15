@@ -12,13 +12,8 @@ import (
 
 var _ = Describe("ClusterOperator Status Check", func() {
 	It("should ensure all ClusterOperators are Available=True, Progressing=False, Degraded=False", func() {
-		client, err := utils.InitializeClusterOperatorClient()
-		if err != nil {
-			fmt.Printf("Error creating MCP client: %v\n", err)
-			return
-		}
 
-		coList, err := utils.GetClusterOperators(client)
+		coList, err := utils.GetClusterOperators(*ctx.COClient)
 		Expect(err).NotTo(HaveOccurred(), "Failed to list MachineConfigPools")
 
 		for _, co := range coList {

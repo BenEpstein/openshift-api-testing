@@ -9,18 +9,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// InitializeClusterOperatorClient returns a ClusterOperatorsGetter client for ClusterOperator operations
-func InitializeClusterOperatorClient() (configclientv1.ClusterOperatorsGetter, error) {
-	config, err := Authenticate()
-	if err != nil {
-		return nil, fmt.Errorf("failed to authenticate: %w", err)
-	}
-
-	return configclientv1.NewForConfig(config)
-}
-
 // GetClusterOperators retrieves one, multiple, or all ClusterOperator objects by name
-func GetClusterOperators(coClient configclientv1.ClusterOperatorsGetter, coNames ...string) ([]configv1.ClusterOperator, error) {
+func GetClusterOperators(coClient configclientv1.ConfigV1Client, coNames ...string) ([]configv1.ClusterOperator, error) {
 	var coList []configv1.ClusterOperator
 
 	if len(coNames) == 0 {

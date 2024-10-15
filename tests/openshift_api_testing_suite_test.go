@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestApiTests(t *testing.T) {
+func TestOpenshiftApiTesting(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "ApiTests Suite")
+	RunSpecs(t, "OpenshiftApiTesting Suite")
 }
